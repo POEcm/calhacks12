@@ -4,7 +4,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 # Habilitar CORS para permitir peticiones desde tu frontend
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 # Definir la carpeta donde se guardarán los audios
 UPLOAD_FOLDER = 'python_uploads'
