@@ -15,7 +15,7 @@ FISH_API = os.getenv("FISH_API")
 
 claude_client = Anthropic(api_key=CLAUDE_API_KEY)
 session = Session(FISH_API)
-ws_session = WebSocketSession(FISH_API)
+#ws_session = WebSocketSession(FISH_API)
 
 OUTPUT_FILENAME = "claude_historia.wav" # El formato ahora es WAV
 
@@ -53,8 +53,6 @@ def claude_text_stream_generator(prompt, media_type = None, base64_image = None)
             }
         )
 
-    print(f"CONTENIDO --> {content}")
-
     print("-> [GENERADOR]: Solicitando stream a Claude...")
     try:
         stream = claude_client.messages.create(
@@ -86,6 +84,8 @@ def audio_stream_generator(prompt, media_type = None, base64_image = None):
     y produce (yields) los 'chunks' de audio en lugar de guardarlos.
     """
     print("Iniciando stream de audio para el frontend...")
+
+    ws_session = WebSocketSession(FISH_API)
     try:
         # Abre la conexión del WebSocket
         with ws_session:
