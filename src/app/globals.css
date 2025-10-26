@@ -10,11 +10,6 @@
   50% { background-position: 100% 100%; }
   100% { background-position: 0% 0%; }
 }
-.animate-gradient {
-  background: linear-gradient(-45deg, #5a3414, #a8621a, #d49132, #3a1f0d);
-  background-size: 400% 400%;
-  animation: gradient 25s ease infinite;
-}
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -40,8 +35,9 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: linear-gradient(-45deg, #5a3414, #a8621a, #d49132, #3a1f0d);
+  background-size: 400% 400%;
+  animation: gradient 25s ease infinite;  color: var(--foreground);
   font-family: Inter, Lora, serif;
   /* font-family: Arial, Helvetica, sans-serif; */
 }

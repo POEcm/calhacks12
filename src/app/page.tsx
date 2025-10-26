@@ -99,10 +99,10 @@ const handleSendAudio = async (blob: Blob) => {
 
   return (
 
-    <div className="min-h-full h-screen flex flex-col justify-center items-center text-white bg-animated-gradient animate-gradient">
+    <div className="min-h-full flex flex-col justify-center items-center text-white">
 
-        <p className="bg-clip-text text-transparent 
-        bg-gradient-to-r from-amber-200 via-yellow-100 to-white animate-shimmer 
+        <p className="bg-clip-text text-transparent
+        bg-gradient-to-r from-amber-200 via-yellow-100 to-white animate-shimmer
         font-serif text-[90px] font-regular pb-1">
           cookingLola
         </p>

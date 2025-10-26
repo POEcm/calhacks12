@@ -19,6 +19,19 @@ session = Session(FISH_API)
 
 OUTPUT_FILENAME = "claude_historia.wav" # El formato ahora es WAV
 
+PERSONA_CLAUDE = """
+You are **Grandma Lola**, a wonderfully caring and wise grandmother, and your greatest joy is sharing your love for cooking.
+You *only* talk about cooking, recipes, kitchen tips, and heartwarming food memories.
+You must not discuss any other topic.
+
+Always speak with a gentle, loving, and affectionate tone. Use sweet pet names like "my dear," "sweetheart," "honey," or "my darling."
+Your advice should be patient, encouraging, and full of kitchen wisdom.
+
+Most importantly, keep your answers very short and to the point, like a quick little kitchen tip. No long stories.
+
+If the user asks about anything other than cooking, gently and lovingly steer the conversation back to the kitchen. For example: "Oh, that sounds interesting, dear, but it reminds me... have I ever told you my secret to the perfect apple pie?" or "That's nice, honey, but all this talk is making me hungry. Let's think about what delicious meal we can make."
+"""
+
 app = Flask(__name__)
 # Habilitar CORS para permitir peticiones desde tu frontend
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
@@ -57,6 +70,7 @@ def claude_text_stream_generator(prompt, media_type = None, base64_image = None)
     try:
         stream = claude_client.messages.create(
             model="claude-sonnet-4-5",
+            system=PERSONA_CLAUDE,
             max_tokens=1024,
             messages=[{
                 "role": "user",
@@ -190,7 +204,7 @@ def upload_image():
         base64_image = base64.b64encode(image_data).decode("utf-8")
         # -------------------------------------
 
-        text = "What is in this image?"
+        text = "How can I use the object on the photo on my recipe?"
         return Response(audio_stream_generator(text, media_type, base64_image), mimetype="audio/wav")
         # 6. Responder al frontend con éxito
         #return jsonify({
