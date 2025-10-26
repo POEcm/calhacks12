@@ -134,6 +134,45 @@ def upload_audio():
         print(f"Error: {e}")
         return jsonify({"success": False, "message": "Error al guardar el audio."}), 500
 
+######## IMAGE
+
+@app.route('/api/upload-image', methods=['POST'])
+def upload_image():
+    try:
+        # 1. Verificar que el archivo 'image' venga en la petición
+        if 'image' not in request.files:
+            return jsonify({"success": False, "message": "No 'image' file part found"}), 400
+
+        file = request.files['image']
+
+        # 2. Si el usuario no selecciona archivo, el navegador envía
+        #    un archivo vacío sin nombre.
+        if file.filename == '':
+            return jsonify({"success": False, "message": "No selected file"}), 400
+
+        # 3. Verificar si el archivo es válido y tiene una extensión permitida
+
+        # 5. Guardar el archivo en la carpeta de imágenes
+        filepath = os.path.join(app.config['IMAGE_UPLOAD_FOLDER'], file.filename)
+        file.save(filepath)
+
+        print(f"Imagen guardada en: {filepath}")
+
+        # 6. Responder al frontend con éxito
+        return jsonify({
+            "success": True,
+            "message": f"Imagen '{file.filename}' guardada exitosamente.",
+            "filepath": filepath
+        }), 200
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"success": False, "message": "Error al guardar la imagen."}), 500
+
+
+
+##### APP
+
 if __name__ == '__main__':
     # Correr el servidor en el puerto 5000 (o el que prefieras)
     app.run(debug=True, port=5000)
