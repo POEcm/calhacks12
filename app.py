@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from anthropic import Anthropic
 from fish_audio_sdk import WebSocketSession, TTSRequest
+import base64
 
 load_dotenv()
 
@@ -139,28 +140,59 @@ def upload_audio():
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
     try:
-        print("1")
         # 1. Verificar que el archivo 'image' venga en la petición
         if 'photo' not in request.files:
             return jsonify({"success": False, "message": "No 'image' file part found"}), 400
-        print("2")
 
         file = request.files['photo']
-        print("3")
 
         # 2. Si el usuario no selecciona archivo, el navegador envía
         #    un archivo vacío sin nombre.
         if file.filename == '':
             return jsonify({"success": False, "message": "No selected file"}), 400
-        print("4")
 
         # 5. Guardar el archivo en la carpeta de imágenes
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
-        print("5")
 
         print(f"Imagen guardada en: {filepath}")
-        print("6")
+
+        # --- 1. Read and Encode Your Image ---
+        media_type = "image/png"  # Or "image/png", "image/gif", "image/webp"
+
+        # Read the image file in binary mode
+        with open(filepath, "rb") as image_file:
+            image_data = image_file.read()
+
+        # Encode the binary data to Base64
+        base64_image = base64.b64encode(image_data).decode("utf-8")
+        # -------------------------------------
+
+        message = claude_client.messages.create(
+            model="claude-sonnet-4-5",  # Or any other vision-capable model
+            max_tokens=1024,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": base64_image,
+                            },
+                        },
+                        {
+                            "type": "text",
+                            "text": "What is in this image?"
+                        }
+                    ],
+                }
+            ],
+        )
+
+        print(message.content[0].text)
 
         # 6. Responder al frontend con éxito
         return jsonify({
