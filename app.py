@@ -139,24 +139,28 @@ def upload_audio():
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
     try:
+        print("1")
         # 1. Verificar que el archivo 'image' venga en la petición
-        if 'image' not in request.files:
+        if 'photo' not in request.files:
             return jsonify({"success": False, "message": "No 'image' file part found"}), 400
+        print("2")
 
-        file = request.files['image']
+        file = request.files['photo']
+        print("3")
 
         # 2. Si el usuario no selecciona archivo, el navegador envía
         #    un archivo vacío sin nombre.
         if file.filename == '':
             return jsonify({"success": False, "message": "No selected file"}), 400
-
-        # 3. Verificar si el archivo es válido y tiene una extensión permitida
+        print("4")
 
         # 5. Guardar el archivo en la carpeta de imágenes
-        filepath = os.path.join(app.config['IMAGE_UPLOAD_FOLDER'], file.filename)
+        filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
+        print("5")
 
         print(f"Imagen guardada en: {filepath}")
+        print("6")
 
         # 6. Responder al frontend con éxito
         return jsonify({
