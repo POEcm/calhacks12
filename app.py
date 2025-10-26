@@ -1,6 +1,15 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from fish_audio_sdk import Session, ASRRequest
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+FISH_API = os.getenv("FISH_API")
+
+session = Session(FISH_API)
 
 app = Flask(__name__)
 # Habilitar CORS para permitir peticiones desde tu frontend
@@ -33,6 +42,19 @@ def upload_audio():
             file.save(filepath)
 
             print(f"Archivo guardado en: {filepath}")
+
+            # Read audio file
+            with open(filepath, "rb") as f:
+                audio_data = f.read()
+
+            # Transcribe
+            response = session.asr(ASRRequest(
+                audio=audio_data,
+                language="en"
+            ))
+
+            print(response.text)
+            print(f"Duration: {response.duration}ms")
 
             # 4. Responder al frontend
             return jsonify({"success": True, "message": "Audio guardado en Python."})
