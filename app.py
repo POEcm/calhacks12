@@ -29,10 +29,32 @@ UPLOAD_FOLDER = 'python_uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --- 1. Generador de Texto de Claude (Tu código) ---
-def claude_text_stream_generator(prompt):
+def claude_text_stream_generator(prompt, media_type = None, base64_image = None):
     """
     Llama a Claude y produce (yields) los fragmentos de texto.
     """
+
+    content = [
+        {
+            "type": "text",
+            "text": prompt
+        }
+    ]
+
+    if (media_type and base64_image):
+        content.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": media_type,
+                    "data": base64_image,
+                },
+            }
+        )
+
+    print(f"CONTENIDO --> {content}")
+
     print("-> [GENERADOR]: Solicitando stream a Claude...")
     try:
         stream = claude_client.messages.create(
@@ -40,7 +62,7 @@ def claude_text_stream_generator(prompt):
             max_tokens=1024,
             messages=[{
                 "role": "user",
-                "content": prompt
+                "content": content
             }],
             stream=True
         )
@@ -58,7 +80,7 @@ def claude_text_stream_generator(prompt):
 
 
 # --- 2. Generador de Stream de Audio (NUEVO) ---
-def audio_stream_generator(prompt):
+def audio_stream_generator(prompt, media_type = None, base64_image = None):
     """
     Este generador llama a Fish Audio con el generador de Claude
     y produce (yields) los 'chunks' de audio en lugar de guardarlos.
@@ -73,7 +95,7 @@ def audio_stream_generator(prompt):
                 TTSRequest(text="",
                            reference_id="8ab06957eca840ee88b6a5f8b2972c0c", # GRANDMA VOICE
                            format="wav"),
-                claude_text_stream_generator(prompt) # ¡El generador conectado!
+                claude_text_stream_generator(prompt, media_type, base64_image) # ¡El generador conectado!
             )
 
             # Itera sobre los *fragmentos de audio* que Fish Audio devuelve
@@ -168,38 +190,14 @@ def upload_image():
         base64_image = base64.b64encode(image_data).decode("utf-8")
         # -------------------------------------
 
-        message = claude_client.messages.create(
-            model="claude-sonnet-4-5",  # Or any other vision-capable model
-            max_tokens=1024,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": base64_image,
-                            },
-                        },
-                        {
-                            "type": "text",
-                            "text": "What is in this image?"
-                        }
-                    ],
-                }
-            ],
-        )
-
-        print(message.content[0].text)
-
+        text = "What is in this image?"
+        return Response(audio_stream_generator(text, media_type, base64_image), mimetype="audio/wav")
         # 6. Responder al frontend con éxito
-        return jsonify({
-            "success": True,
-            "message": f"Imagen '{file.filename}' guardada exitosamente.",
-            "filepath": filepath
-        }), 200
+        #return jsonify({
+        #    "success": True,
+        #    "message": f"Imagen '{file.filename}' guardada exitosamente.",
+        #    "filepath": filepath
+        #}), 200
 
     except Exception as e:
         print(f"Error: {e}")
