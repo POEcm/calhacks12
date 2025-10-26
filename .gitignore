@@ -46,4 +46,4 @@ venv/*
 *.m4a
 *.wav
 *.jpeg
-*.png
+photo.png
