@@ -46,7 +46,7 @@ def claude_text_stream_generator():
             max_tokens=1024,
             messages=[{
                 "role": "user",
-                "content": "Write a very small story about a robot and music."
+                "content": "Very easy steps on how to do a cooking recipe."
             }],
             stream=True  # ¡Modo streaming!
         )
@@ -86,7 +86,7 @@ try:
             # 2. Pasa la *función generadora* que creamos
             audio_stream = ws_session.tts(
                 TTSRequest(text="",
-                    reference_id="54e3a85ac9594ffa83264b8a494b901b",
+                    reference_id="8ab06957eca840ee88b6a5f8b2972c0c", # GRANDMA VOICE
                     format="wav"),  # Texto base vacío
                 claude_text_stream_generator()  # ¡El generador conectado!
             )
